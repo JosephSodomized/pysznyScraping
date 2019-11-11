@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from pyszne.models import Info
 import requests
 import itertools
 # import mysql.connector
@@ -76,5 +77,20 @@ def scraper(request):
     except AttributeError:
         print('Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i spróbowanie ponownie.')
 
-    return HttpResponse(namesList)
-    # return HttpResponse("You're looking at question %s." % question_id)
+    for x in hrefLinks:
+        r2 = requests.get('https://www.pyszne.pl/' + x + '#opinie')
+        html2 = urlopen(r2.url)
+        bs2 = BeautifulSoup(html2, 'html.parser')
+        if (bs2.find('div', {'class': 'rating-number-container'}) != None):
+            ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.split()
+            ratingNumbers.append(ratingNumber)
+        else:
+            ratingNumbers.append("0")
+
+    ratingNumbers_list = list(itertools.chain(*ratingNumbers))
+
+    for a, b, c, d, e, f, g in zip(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost,minimumOrder, ratingNumbers_list):
+        i = Info(title=a, kitchen=b, review_count=c, average_delivery_time=d, delivery_cost=e, minimum_order=f, rating_number=g)
+        i.save()
+
+        # Tutaj bedzie jakiś return response na templatke z tymi przyciskami
