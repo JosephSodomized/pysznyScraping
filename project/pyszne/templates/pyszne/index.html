@@ -1,0 +1,14 @@
+{% extends 'pyszne/layout.html' %}
+
+{% block content %}
+        <div>
+            <p id="postcode">Podaj kod pocztowy</p>
+        </div>
+        <div>
+            <form action="scraper/" method="post">
+                {% csrf_token %}
+                <input type="search" placeholder="np. 30-529" maxlength="6" pattern="[0-9]{2}\-[0-9]{3}" name="postCode" autocomplete="off" required autofocus>
+                <input type="submit" class="button" value="Szukaj">
+            </form>
+        </div>
+{% endblock %}
