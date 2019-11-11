@@ -68,8 +68,11 @@ for x in hrefLinks:
     r2 = requests.get('https://www.pyszne.pl/'+x+'#opinie')
     html2 = urlopen(r2.url)
     bs2 = BeautifulSoup(html2, 'html.parser')
-    ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.split()
-    ratingNumbers.append(ratingNumber)
+    if (bs2.find('div', {'class': 'rating-number-container'}) != None) :
+        ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.split()
+        ratingNumbers.append(ratingNumber)
+    else :
+        ratingNumbers.append("0")
 
 ratingNumbers_list = list(itertools.chain(*ratingNumbers))
 
