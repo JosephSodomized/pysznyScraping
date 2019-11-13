@@ -1,7 +1,6 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
-import itertools
 import mysql.connector
 
 postcode = str(input("Proszę podać kod pocztowy: "))
@@ -18,6 +17,7 @@ deliveryCost = []
 minimumOrder = []
 hrefLinks = []
 ratingNumbers = []
+lastWrittenReviews = []
 
 try:
     for link in bs.find('div', {'class':'restaurants restaurantlist js-restaurantlist'}).find_all(
@@ -33,13 +33,13 @@ try:
                 reviewCount.append(count.get('content'))
             time = link.find_all('div', {'class':'avgdeliverytime open'})
             for delivery in time:
-                averageDeliveryTime.append(delivery.text.strip().lower())
+                averageDeliveryTime.append(delivery.text.strip().lower().replace('.', '. '))
             cost = link.find_all('div', {'class':'delivery-cost js-delivery-cost'})
             for delivery in cost:
                 deliveryCost.append(delivery.text.strip())
             order = link.find_all('div', {'class': 'min-order'})
             for minimum in order:
-                minimumOrder.append(minimum.text.strip())
+                minimumOrder.append(minimum.text.strip().lower())
             hrefs = link.find_all('a', itemprop='name')
             for href in hrefs:
                 hrefLinks.append(href.get('href'))
@@ -68,25 +68,26 @@ for x in hrefLinks:
     r2 = requests.get('https://www.pyszne.pl/'+x+'#opinie')
     html2 = urlopen(r2.url)
     bs2 = BeautifulSoup(html2, 'html.parser')
-    if (bs2.find('div', {'class': 'rating-number-container'}) != None) :
-        ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.split()
+    if (bs2.find('div', {'class': 'rating-number-container'}) != None):
+        ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text
         ratingNumbers.append(ratingNumber)
-    else :
+    else:
         ratingNumbers.append("0")
+    if (bs2.find('section', {'class': 'reviewbody'}) !=None):
+        lastWrittenReview = bs2.find('section', {'class': 'reviewbody'}).text
+        lastWrittenReviews.append(lastWrittenReview)
+    else:
+        lastWrittenReviews.append("Brak recenzji")
 
-ratingNumbers_list = list(itertools.chain(*ratingNumbers))
+print(ratingNumbers)
+print(lastWrittenReviews)
 
-print(ratingNumbers_list)
-
-mydb = mysql.connector.connect(host='127.0.0.1', database='extract', user='root', password='password', auth_plugin='mysql_native_password')
+mydb = mysql.connector.connect(host='serwer1911877.home.pl', database='31775790_etl', user='31775790_etl', password='fOXMs2si', auth_plugin='mysql_native_password')
 
 mycursor = mydb.cursor()
 
-for a,b,c,d,e,f,g in zip(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers_list):
-        query = 'INSERT INTO info(title, kitchen, review_count, average_delivery_time, delivery_cost, minimum_order, rating_number) VALUES (%s,%s,%s,%s,%s,%s,%s)'
-        values = (a, b, c, d, e, f, g)
+for a, b, c, d, e, f, g, h in zip(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
+        query = 'INSERT INTO info(title, kitchen, review_count, average_delivery_time, delivery_cost, minimum_order, rating_number, last_written_review) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
+        values = (a, b, c, d, e, f, g, h)
         mycursor.execute(query,values)
         mydb.commit()
-
-
-
