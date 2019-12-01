@@ -99,7 +99,7 @@ def processTransform():
 
 
 def processLoad():
-    mydb = mysql.connector.connect(host='127.0.0.1', database='info', user='root', password='pluralsight', auth_plugin='mysql_native_password')
+    mydb = mysql.connector.connect(host='serwer1911877.home.pl', database='31775790_etl', user='31775790_etl', password='fOXMs2si', auth_plugin='mysql_native_password')
     ratingNumbers_list = list(itertools.chain(*ratingNumbers))  
 
     mycursor = mydb.cursor()
