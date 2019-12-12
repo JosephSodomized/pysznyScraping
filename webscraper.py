@@ -1,8 +1,13 @@
-from urllib.request import urlopen
+#!/usr/bin/env python
+# -*- coding: utf-8 -*- 
+from urllib2 import urlopen
 from bs4 import BeautifulSoup
 import requests
 import mysql.connector
 import itertools
+import sys
+import json
+import os
 
 namesList = []
 kitchensList = []
@@ -14,9 +19,76 @@ hrefLinks = []
 ratingNumbers = []
 lastWrittenReviews = []
 
+def saveFile(name, content):
+  with open("data/" + name + ".json", "w") as f:
+    f.write(content)
 
-def ProcessExtract():
-    postcode = str(input("Proszę podać kod pocztowy: "))
+def saveFiles():
+    saveFile('namesList', json.dumps(namesList))
+    saveFile('kitchensList', json.dumps(kitchensList))
+    saveFile('reviewCount', json.dumps(reviewCount))
+    saveFile('averageDeliveryTime', json.dumps(averageDeliveryTime))
+    saveFile('deliveryCost', json.dumps(deliveryCost))
+    saveFile('minimumOrder', json.dumps(minimumOrder))
+    saveFile('hrefLinks', json.dumps(hrefLinks))
+    saveFile('ratingNumbers', json.dumps(ratingNumbers))
+    saveFile('lastWrittenReviews', json.dumps(lastWrittenReviews))
+
+def deleteFile(name):
+  os.remove("data/" + name + ".json")
+
+def loadFiles():
+    global namesList
+    global kitchensList
+    global reviewCount
+    global averageDeliveryTime
+    global deliveryCost
+    global minimumOrder
+    global hrefLinks
+    global ratingNumbers
+    global lastWrittenReviews
+
+    with open("data/namesList.json") as f:
+      namesList = json.loads(f.read())
+    with open("data/kitchensList.json") as f:
+      kitchensList = json.loads(f.read())
+    with open("data/reviewCount.json") as f:
+      reviewCount = json.loads(f.read())
+    with open("data/averageDeliveryTime.json") as f:
+      averageDeliveryTime = json.loads(f.read())
+    with open("data/deliveryCost.json") as f:
+      deliveryCost = json.loads(f.read())
+    with open("data/minimumOrder.json") as f:
+      minimumOrder = json.loads(f.read())
+    with open("data/hrefLinks.json") as f:
+      hrefLinks = json.loads(f.read())
+    with open("data/ratingNumbers.json") as f:
+      ratingNumbers = json.loads(f.read())
+    with open("data/lastWrittenReviews.json") as f:
+      lastWrittenReviews = json.loads(f.read())
+
+def deleteFiles():
+  deleteFile('namesList')
+  deleteFile('kitchensList')
+  deleteFile('reviewCount')
+  deleteFile('averageDeliveryTime')
+  deleteFile('deliveryCost')
+  deleteFile('minimumOrder')
+  deleteFile('hrefLinks')
+  deleteFile('ratingNumbers')
+  deleteFile('lastWrittenReviews')
+
+def processExtract(postcode):
+    global namesList
+    global kitchensList
+    global reviewCount
+    global averageDeliveryTime
+    global deliveryCost
+    global minimumOrder
+    global hrefLinks
+    global ratingNumbers
+    global lastWrittenReviews
+
     r = requests.get('https://www.pyszne.pl/' + postcode)
 
     html = urlopen(r.url)
@@ -46,7 +118,6 @@ def ProcessExtract():
                 hrefs = link.find_all('a', itemprop='name')
                 for href in hrefs:
                     hrefLinks.append(href.get('href'))
-
 
         while True:
             try:
@@ -85,39 +156,58 @@ def ProcessExtract():
     print(ratingNumbers)
     print(lastWrittenReviews)
 
+    saveFiles()
 
 def processTransform():
-    for eachDeliveryCost in deliveryCost :
-        if (eachDeliveryCost == 'GRATIS') :
-            deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
-        else :
-            deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3] 
+  global deliveryCost
+  global minimumOrder
 
-    for eachMiniumOrder in minimumOrder :
-        minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
+  loadFiles()
 
+  for eachDeliveryCost in deliveryCost :
+    if (eachDeliveryCost == 'GRATIS') :
+      deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
+    else :
+      deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3] 
+
+  for eachMiniumOrder in minimumOrder :
+    minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
+
+  saveFiles()
 
 
 def processLoad():
+    loadFiles()
+
     mydb = mysql.connector.connect(host='serwer1911877.home.pl', database='31775790_etl', user='31775790_etl', password='fOXMs2si', auth_plugin='mysql_native_password')
     ratingNumbers_list = list(itertools.chain(*ratingNumbers))  
 
     mycursor = mydb.cursor()
 
-    for a, b, c, d, e, f, g, h in zip(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
+    for a, b, c, d, e, f, g, h in itertools.zip_longest(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
             query = 'INSERT INTO info(title, kitchen, review_count, average_delivery_time, delivery_cost, minimum_order, rating_number, last_written_review) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
-            values = (a, b, c, d, e, f, g, h)
+            values = (a, b, c, d, e, f, g)
             mycursor.execute(query,values)
             mydb.commit()
 
+    deleteFiles()
 
 
 def main():
-    ProcessExtract()
+    postcode = str(input("Proszę podać kod pocztowy: "))
+
+    processExtract(postcode)
     processTransform()
     processLoad()
 
 
   
 if __name__== "__main__":
-  main()
+  if("processExtract" in sys.argv):
+    processExtract(sys.argv[2])
+  elif("processTransform" in sys.argv):
+    processTransform()
+  elif("processLoad" in sys.argv):
+    processLoad()
+  else:
+    main(sys.argv[1])
