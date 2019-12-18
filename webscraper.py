@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
-from urllib.request import urlopen
+from urllib2 import urlopen
 from bs4 import BeautifulSoup
 import requests
 import mysql.connector
@@ -8,7 +8,6 @@ import itertools
 import sys
 import json
 import os
-import csv
 
 namesList = []
 kitchensList = []
@@ -21,7 +20,7 @@ ratingNumbers = []
 lastWrittenReviews = []
 
 def saveFile(name, content):
-  with open("data" + name + ".json", "w+") as f:
+  with open("data/" + name + ".json", "w") as f:
     f.write(content)
 
 def saveFiles():
@@ -36,7 +35,7 @@ def saveFiles():
     saveFile('lastWrittenReviews', json.dumps(lastWrittenReviews))
 
 def deleteFile(name):
-  os.remove("data" + name + ".json")
+  os.remove("data/" + name + ".json")
 
 def loadFiles():
     global namesList
@@ -49,23 +48,23 @@ def loadFiles():
     global ratingNumbers
     global lastWrittenReviews
 
-    with open("datanamesList.json") as f:
+    with open("data/namesList.json") as f:
       namesList = json.loads(f.read())
-    with open("datakitchensList.json") as f:
+    with open("data/kitchensList.json") as f:
       kitchensList = json.loads(f.read())
-    with open("datareviewCount.json") as f:
+    with open("data/reviewCount.json") as f:
       reviewCount = json.loads(f.read())
-    with open("dataaverageDeliveryTime.json") as f:
+    with open("data/averageDeliveryTime.json") as f:
       averageDeliveryTime = json.loads(f.read())
-    with open("datadeliveryCost.json") as f:
+    with open("data/deliveryCost.json") as f:
       deliveryCost = json.loads(f.read())
-    with open("dataminimumOrder.json") as f:
+    with open("data/minimumOrder.json") as f:
       minimumOrder = json.loads(f.read())
-    with open("datahrefLinks.json") as f:
+    with open("data/hrefLinks.json") as f:
       hrefLinks = json.loads(f.read())
-    with open("dataratingNumbers.json") as f:
+    with open("data/ratingNumbers.json") as f:
       ratingNumbers = json.loads(f.read())
-    with open("datalastWrittenReviews.json") as f:
+    with open("data/lastWrittenReviews.json") as f:
       lastWrittenReviews = json.loads(f.read())
 
 def deleteFiles():
@@ -174,9 +173,6 @@ def processTransform():
   for eachMiniumOrder in minimumOrder :
     minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
 
-  for eachlastWrittenReview in lastWrittenReviews:
-    lastWrittenReviews[lastWrittenReviews.index(eachlastWrittenReview)] = eachlastWrittenReview.replace("\n", " ")
-
   saveFiles()
 
 
@@ -190,19 +186,11 @@ def processLoad():
 
     for a, b, c, d, e, f, g, h in itertools.zip_longest(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
             query = 'INSERT INTO info(title, kitchen, review_count, average_delivery_time, delivery_cost, minimum_order, rating_number, last_written_review) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
-            values = (a, b, c, d, e, f, g, h)
+            values = (a, b, c, d, e, f, g)
             mycursor.execute(query,values)
             mydb.commit()
 
     deleteFiles()
-
-def saveAsCsv():
-  with open("import.csv", "w+", encoding='utf-8') as file:
-    writer = csv.writer(file, delimiter=' ')
-    ratingNumbers_list = list(itertools.chain(*ratingNumbers))
-    for a, b, c, d, e, f, g, h in itertools.zip_longest(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
-      writer.writerow([a, b, c, d, e, f, g, str(h)])
-
 
 
 def main():
@@ -211,7 +199,6 @@ def main():
     processExtract(postcode)
     processTransform()
     processLoad()
-
 
 
   
