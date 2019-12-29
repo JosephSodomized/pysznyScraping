@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*- 
-from urllib2 import urlopen
+from urllib.request import urlopen
 from bs4 import BeautifulSoup
 import requests
 import mysql.connector
@@ -89,8 +89,9 @@ def processExtract(postcode):
     global ratingNumbers
     global lastWrittenReviews
 
-    r = requests.get('https://www.pyszne.pl/' + postcode)
+    print('sdffsdf')
 
+    r = requests.get('https://www.pyszne.pl/restauracja-' + postcode)
     html = urlopen(r.url)
     bs = BeautifulSoup(html, 'html.parser')
 
@@ -159,34 +160,34 @@ def processExtract(postcode):
     saveFiles()
 
 def processTransform():
-  global deliveryCost
-  global minimumOrder
+    global deliveryCost
+    global minimumOrder
 
-  loadFiles()
+    loadFiles()
 
-  for eachDeliveryCost in deliveryCost :
-    if (eachDeliveryCost == 'GRATIS') :
-      deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
-    else :
-      deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3] 
+    for eachDeliveryCost in deliveryCost :
+        if (eachDeliveryCost == 'GRATIS') :
+            deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
+        else:
+             deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3]
 
-  for eachMiniumOrder in minimumOrder :
-    minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
+    for eachMiniumOrder in minimumOrder :
+        minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
 
-  saveFiles()
+    saveFiles()
 
 
 def processLoad():
     loadFiles()
 
     mydb = mysql.connector.connect(host='serwer1911877.home.pl', database='31775790_etl', user='31775790_etl', password='fOXMs2si', auth_plugin='mysql_native_password')
-    ratingNumbers_list = list(itertools.chain(*ratingNumbers))  
+    ratingNumbers_list = list(itertools.chain(*ratingNumbers))
 
     mycursor = mydb.cursor()
 
     for a, b, c, d, e, f, g, h in itertools.zip_longest(namesList, kitchensList, reviewCount, averageDeliveryTime, deliveryCost, minimumOrder, ratingNumbers, lastWrittenReviews):
             query = 'INSERT INTO info(title, kitchen, review_count, average_delivery_time, delivery_cost, minimum_order, rating_number, last_written_review) VALUES (%s,%s,%s,%s,%s,%s,%s,%s)'
-            values = (a, b, c, d, e, f, g)
+            values = (a, b, c, d, e, f, g, h)
             mycursor.execute(query,values)
             mydb.commit()
 
@@ -200,8 +201,8 @@ def main():
     processTransform()
     processLoad()
 
+print('okokok')
 
-  
 if __name__== "__main__":
   if("processExtract" in sys.argv):
     processExtract(sys.argv[2])
@@ -210,4 +211,4 @@ if __name__== "__main__":
   elif("processLoad" in sys.argv):
     processLoad()
   else:
-    main(sys.argv[1])
+    main()

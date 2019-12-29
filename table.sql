@@ -1,1 +1,0 @@
-CREATE TABLE info (id SMALLINT NOT NULL AUTO_INCREMENT, title VARCHAR(200), kitchen VARCHAR(200), review_count SMALLINT, average_delivery_time VARCHAR(200), delivery_cost VARCHAR(200), minimum_order VARCHAR(200), rating_number FLOAT, PRIMARY KEY(id))
