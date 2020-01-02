@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*- 
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
+from subprocess import *
 import requests
 import mysql.connector
 import itertools
@@ -89,7 +90,7 @@ def processExtract(postcode):
     global ratingNumbers
     global lastWrittenReviews
 
-    print('sdffsdf')
+
 
     r = requests.get('https://www.pyszne.pl/restauracja-' + postcode)
     html = urlopen(r.url)
@@ -139,6 +140,8 @@ def processExtract(postcode):
     except AttributeError:
         print('Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i spróbowanie ponownie.')
 
+    print(hrefLinks)
+
     for x in hrefLinks:
         r2 = requests.get('https://www.pyszne.pl/'+ x +'#opinie')
         html2 = urlopen(r2.url)
@@ -180,7 +183,7 @@ def processTransform():
 def processLoad():
     loadFiles()
 
-    mydb = mysql.connector.connect(host='serwer1911877.home.pl', database='31775790_etl', user='31775790_etl', password='fOXMs2si', auth_plugin='mysql_native_password')
+    mydb = mysql.connector.connect(host='localhost', database='31775790_etl', user='root', password='', auth_plugin='mysql_native_password')
     ratingNumbers_list = list(itertools.chain(*ratingNumbers))
 
     mycursor = mydb.cursor()
@@ -194,11 +197,14 @@ def processLoad():
     deleteFiles()
 
 
-def main():
-    postcode = str(input("Proszę podać kod pocztowy: "))
+def main(postcode):
+    # postcode = str(input("Proszę podać kod pocztowy: "))
 
+    print('extract')
     processExtract(postcode)
+    print('trans')
     processTransform()
+    print('load')
     processLoad()
 
 print('okokok')
@@ -211,4 +217,4 @@ if __name__== "__main__":
   elif("processLoad" in sys.argv):
     processLoad()
   else:
-    main()
+    main(sys.argv[2])
