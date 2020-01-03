@@ -138,7 +138,8 @@ def processExtract(postcode):
         print(hrefLinks)
 
     except AttributeError:
-        print('Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i spróbowanie ponownie.')
+        print('Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i sprobowanie ponownie.')
+        return
 
     print(hrefLinks)
 
@@ -200,14 +201,10 @@ def processLoad():
 def main(postcode):
     # postcode = str(input("Proszę podać kod pocztowy: "))
 
-    print('extract')
     processExtract(postcode)
-    print('trans')
     processTransform()
-    print('load')
     processLoad()
 
-print('okokok')
 
 if __name__== "__main__":
   if("processExtract" in sys.argv):

@@ -4,6 +4,8 @@ $( document ).ready(function() {
 
         event.preventDefault();
 
+
+
         $('#allProcess').prop('disabled', "true");
         $('#processExtract').prop('disabled', "true");
         $('#processTransform').prop('disabled', "true");
@@ -24,21 +26,33 @@ $( document ).ready(function() {
         var url = window.location.origin + "/pysznyScraping/index.php?ajax=1&process=" + data['process'] + '&postcode=' + data['postcode'];
 
         var xhttp = new XMLHttpRequest();
+
         xhttp.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
 
+                var errorMessage = 'Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i sprobowanie ponownie.';
+                var messageClass = 'countOfRecords';
                 if(data['process'] == 'processExtract')
                 {
+
+                    clearClass(messageClass);
+                    if(this.responseText.trim() === errorMessage) {
+
+                        $('#etlForm').append('<p class="countOfRecords alert alert-danger">Error: ' + this.responseText + '</p>');
+                        $('#processExtract').removeAttr('disabled');
+                        $('#allProcess').removeAttr('disabled');
+                        return;
+                    }
+
+                    var countOfRecords = this.responseText;
+
+                    $('#etlForm').append('<p class="countOfRecords alert alert-success">Liczba pobranych rekordów: ' + countOfRecords + '</p>');
+
                     $('#processExtract').removeAttr('disabled');
                     $('#processTransform').removeAttr('disabled');
                     $('#processLoad').attr('disabled');
                     $('#showResults').addClass('d-none');
-
-                    console.log(this.responseText);
-                    var countOfRecords = this.responseText;
-
-                    $('#etlForm').append('<p class="countOfRecords">Liczba pobranych rekordów: ' + countOfRecords + '</p>');
-                }
+            }
 
                 if(data['process'] == 'processTransform')
                 {
@@ -47,21 +61,33 @@ $( document ).ready(function() {
 
                 if(data['process'] == 'processLoad')
                 {
+                    var countOfRecords = this.responseText;
+                    clearClass(messageClass);
+                    $('#etlForm').append('<p class="countOfRecords alert alert-success">Liczba rekordów załadowanych do bazy danych: ' + countOfRecords + '</p>');
+
                     $('#processTransform').prop('disabled', "true");
                     $('#showResults').removeClass('d-none');
-
-                    var countOfRecords = this.responseText;
-
-                    $('#etlForm').append('<p class="countOfRecords">Liczba rekordów załadowanych do bazy danych: ' + countOfRecords + '</p>');
                 }
 
                 if(data['process'] == 'allProcess')
                 {
+                    clearClass(messageClass);
+                    if(this.responseText.trim() === errorMessage) {
+
+                        $('#etlForm').append('<p class="countOfRecords alert alert-danger">Error: ' + this.responseText + '</p>');
+                        $('#processExtract').removeAttr('disabled');
+                        $('#allProcess').removeAttr('disabled');
+
+                        return;
+                    }
+                    var countOfRecords = this.responseText;
+                    $('#etlForm').append('<p class="countOfRecords alert alert-success">Liczba rekordów załadowanych do bazy danych: ' + countOfRecords + '</p>');
+
                     $('#processExtract').removeAttr('disabled');
                     $('#allProcess').removeAttr('disabled');
+                    $('#showResults').removeClass('d-none');
 
-                    var countOfRecords = this.responseText;
-                    $('#etlForm').append('<p class="countOfRecords">Liczba rekordów załadowanych do bazy danych: ' + countOfRecords + '</p>');
+
                 }
 
             }
@@ -73,4 +99,8 @@ $( document ).ready(function() {
 
 });
 
+function clearClass(className)
+{
+    $("." + className).remove();
+}
 

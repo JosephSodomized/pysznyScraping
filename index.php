@@ -16,7 +16,12 @@
         $process = isset($_GET['process']) ? $_GET['process'] : '';
         $postcode = isset($_GET['postcode']) ? $_GET['postcode'] : '';
 
-        shell_exec('python '.__DIR__.'/webscraper.py '.$process.' '.$postcode);
+        $result = shell_exec('python '.__DIR__.'/webscraper.py '.$process.' '.$postcode);
+        $error = 'Wprowadzony kod pocztowy nie istnieje. Prosimy o sprawdzenie danych i sprobowanie ponownie.';
+        if(trim($result, ' ') == $error) {
+            echo $error;
+            die;
+        }
 
         if ($_GET['process'] == 'processExtract')
         {
@@ -62,7 +67,7 @@
               <h5 class="text-white mt-3">Podaj kod pocztowy</h5>
             </div>
             <div class="input-group mb-3 w-25 p-3 mx-auto">
-              <input type="text" class="form-control" placeholder="np. 30-529" maxlength="6" name="postcode" pattern="[0-9]{2}\-[0-9]{3}" autocomplete="off" required autofocus aria-label="Kod pocztowy" value="" />
+              <input type="text" class="form-control" placeholder="np. 30-529" maxlength="6" name="postcode" autocomplete="off" required autofocus aria-label="Kod pocztowy" value="" />
             </div>
             <div class="mb-3" aria-label="ETL">
               <button type="submit" id="allProcess" name="submitETL" class=" ETLButton btn btn-secondary" value="ETL">ETL</button>
