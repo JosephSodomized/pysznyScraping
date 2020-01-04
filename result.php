@@ -98,7 +98,7 @@
         $(".table").DataTable({
             "ordering": true,
             "searching": true,
-            "paging": true,
+            "paging": false,
             "order": [[2, "desc"]],
             "language": {
                 "decimal": ",",
