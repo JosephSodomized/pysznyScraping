@@ -148,7 +148,8 @@ def processExtract(postcode):
         html2 = urlopen(r2.url)
         bs2 = BeautifulSoup(html2, 'html.parser')
         if (bs2.find('div', {'class': 'rating-number-container'}) != None):
-            ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text
+            ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.replace('.', ',')
+            
             ratingNumbers.append(ratingNumber)
         else:
             ratingNumbers.append("0")
