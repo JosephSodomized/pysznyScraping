@@ -168,14 +168,17 @@ def processTransform():
     global minimumOrder
 
     loadFiles()
+    
+    for eachAverageDeliveryTime in averageDeliveryTime:
+        averageDeliveryTime[averageDeliveryTime.index(eachAverageDeliveryTime)] = eachAverageDeliveryTime[3:]
 
-    for eachDeliveryCost in deliveryCost :
-        if (eachDeliveryCost == 'GRATIS') :
+    for eachDeliveryCost in deliveryCost:
+        if (eachDeliveryCost == 'GRATIS'):
             deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
         else:
              deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3]
 
-    for eachMiniumOrder in minimumOrder :
+    for eachMiniumOrder in minimumOrder:
         minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
 
     saveFiles()
