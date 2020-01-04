@@ -83,7 +83,7 @@
             </table>
         </div>
         <button onclick="exportToCSV('plik.csv')" class="m-1">Eksportuj do pliku .csv</button>
-        <form action="/pyszny_scraping/delete.php" method="get">
+        <form action="delete.php" method="get">
             <input type="submit" value="Wyczyść dane" class="mt-1 mb-3">
         </form>
 
