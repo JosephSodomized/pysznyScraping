@@ -148,7 +148,7 @@ def processExtract(postcode):
         html2 = urlopen(r2.url)
         bs2 = BeautifulSoup(html2, 'html.parser')
         if (bs2.find('div', {'class': 'rating-number-container'}) != None):
-            ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text
+            ratingNumber = bs2.find('div', {'class': 'rating-number-container'}).find('span').text.replace('.', ',')        
             ratingNumbers.append(ratingNumber)
         else:
             ratingNumbers.append("0")
@@ -156,7 +156,7 @@ def processExtract(postcode):
             lastWrittenReview = bs2.find('section', {'class': 'reviewbody'}).text
             lastWrittenReviews.append(lastWrittenReview)
         else:
-            lastWrittenReviews.append("Brak recenzji")
+            lastWrittenReviews.append("")
 
     print(ratingNumbers)
     print(lastWrittenReviews)
@@ -168,15 +168,18 @@ def processTransform():
     global minimumOrder
 
     loadFiles()
+    
+    for eachAverageDeliveryTime in averageDeliveryTime:
+        averageDeliveryTime[averageDeliveryTime.index(eachAverageDeliveryTime)] = eachAverageDeliveryTime[3:-3]
 
-    for eachDeliveryCost in deliveryCost :
-        if (eachDeliveryCost == 'GRATIS') :
+    for eachDeliveryCost in deliveryCost:
+        if (eachDeliveryCost == 'GRATIS'):
             deliveryCost[deliveryCost.index(eachDeliveryCost)] = 0
         else:
              deliveryCost[deliveryCost.index(eachDeliveryCost)] = eachDeliveryCost[:-3]
 
-    for eachMiniumOrder in minimumOrder :
-        minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[4:-3]
+    for eachMiniumOrder in minimumOrder:
+        minimumOrder[minimumOrder.index(eachMiniumOrder)] = eachMiniumOrder[5:-3]
 
     saveFiles()
 

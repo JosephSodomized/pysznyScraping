@@ -50,9 +50,9 @@
                     <td>Nazwa restauracji</td>
                     <td>Rodzaj kuchni</td>
                     <td>Liczba recenzji</td>
-                    <td>Czas dostawy</td>
-                    <td>Koszt dostawy</td>
-                    <td>Zamówienie minimalne</td>
+                    <td>Średni czas dostawy (minuty)</td>
+                    <td>Koszt dostawy (zł)</td>
+                    <td>Zamówienie minimalne (zł)</td>
                     <td>Ocena</td>
                     <td>Ostatnia recenzja</td>
                 </tr>
@@ -60,7 +60,7 @@
                 <tbody>
                 <?php
                 $conn = new mysqli('localhost', 'root', '', '31775790_etl');
-                $sql = $conn->query('SELECT * FROM info');
+                $sql = $conn->query('SELECT * FROM info GROUP BY title HAVING COUNT(*) >= 1');
 
                 while($data = $sql->fetch_array()) {
 
@@ -98,7 +98,7 @@
         $(".table").DataTable({
             "ordering": true,
             "searching": true,
-            "paging": true,
+            "paging": false,
             "order": [[2, "desc"]],
             "language": {
                 "decimal": ",",
