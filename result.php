@@ -50,9 +50,9 @@
                     <td>Nazwa restauracji</td>
                     <td>Rodzaj kuchni</td>
                     <td>Liczba recenzji</td>
-                    <td>Czas dostawy</td>
-                    <td>Koszt dostawy</td>
-                    <td>Zamówienie minimalne</td>
+                    <td>Średni czas dostawy (minuty)</td>
+                    <td>Koszt dostawy (zł)</td>
+                    <td>Zamówienie minimalne (zł)</td>
                     <td>Ocena</td>
                     <td>Ostatnia recenzja</td>
                 </tr>
