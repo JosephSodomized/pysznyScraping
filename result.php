@@ -60,7 +60,7 @@
                 <tbody>
                 <?php
                 $conn = new mysqli('localhost', 'root', '', '31775790_etl');
-                $sql = $conn->query('SELECT * FROM info');
+                $sql = $conn->query('SELECT * FROM info GROUP BY title HAVING COUNT(*) >= 1');
 
                 while($data = $sql->fetch_array()) {
 
