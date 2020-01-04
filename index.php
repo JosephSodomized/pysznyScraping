@@ -1,5 +1,6 @@
 <?php
 
+
     $conn = new mysqli('localhost', 'root', '', '31775790_etl');
 
     if (mysqli_connect_errno())
@@ -82,23 +83,6 @@
         <div class="mt-3">
             <a id="showResults" class="d-none" aria-label="Results" href="result.php">Zobacz wyniki</a>
         </div>
-
-        <?php if (isset($countOfExtractRecords)) :?>
-
-            <div class="text-center">
-                <p>Liczba pobranych rekordów: <?php echo $countOfExtractRecords; ?></p>
-            </div>
-
-        <?php endif; ?>
-
-        <?php if (isset($countOfLoadRecords)) :?>
-
-            <div class="text-center">
-                <p>Liczba rekordów załadowanych do bazy danych: <?php echo $countOfLoadRecords; ?></p>
-            </div>
-
-        <?php endif; ?>
-
 
     </div>
 

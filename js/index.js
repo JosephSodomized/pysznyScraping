@@ -87,7 +87,6 @@ $( document ).ready(function() {
                     $('#allProcess').removeAttr('disabled');
                     $('#showResults').removeClass('d-none');
 
-
                 }
 
             }
