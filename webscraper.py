@@ -110,13 +110,13 @@ def processExtract(postcode):
                     reviewCount.append(count.get('content'))
                 time = link.find_all('div', {'class':'avgdeliverytime avgdeliverytimefull open'})
                 for delivery in time:
-                    averageDeliveryTime.append(delivery.text.strip().lower())
+                    averageDeliveryTime.append(delivery.text.strip())
                 cost = link.find_all('div', {'class':'delivery-cost js-delivery-cost'})
                 for delivery in cost:
                     deliveryCost.append(delivery.text.strip())
                 order = link.find_all('div', {'class': 'min-order'})
                 for minimum in order:
-                    minimumOrder.append(minimum.text.strip().lower())
+                    minimumOrder.append(minimum.text.strip())
                 hrefs = link.find_all('a', itemprop='name')
                 for href in hrefs:
                     hrefLinks.append(href.get('href'))
